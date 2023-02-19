@@ -3,9 +3,7 @@ A simple Student Enrollment form using JSONPowerDB
 This is simple Student Enrollment form which takes user input from html page and saves the data in JPDP and data can be updated if data exist in JPDP.
 Table of contents
 
-    Benefits of using JSONPowerDB
-    Release History
-    Examplea of use 
+    
 
 Benefits of using JSONPowerDB
 
