@@ -1,0 +1,235 @@
+<html lang="en">
+<head>
+<title>Login2Xplore Assignment</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script>
+window.addEventListener("load",function(){$("#rollNumber").focus();});
+
+</script>
+</head>
+<body>
+<div class='container'>
+<br>
+<center><h1> Student Enrollment Form</h1></center>
+<br>
+<form id='studentForm' method='get'>
+<div class='form-group'>
+<label>Student Roll Number : </label>
+<input type='number' id='rollNumber' class='form-control' onchange='getStudent()'>
+</div>
+
+<div class='form-group'>
+<label>Student Name</label>
+<input type='text' id='name' class='form-control' disabled>
+</div>
+
+<div class='form-group'>
+<label>Class</label>
+<input type='text' id='className' class='form-control' disabled>
+</div>
+
+<div class='form-group'>
+<label>Birth Date</label>
+<input type='date' id='dateOfBirth' class='form-control' disabled>
+</div>
+
+<div class='form-group'>
+<label>Address</label>
+<input type='text' id='address' class='form-control' disabled>
+</div>
+
+<div class='form-group'>
+<label>Enrollment Date</label>
+<input type='date' id='enrollmentDate' class='form-control' disabled>
+</div>
+
+<div class='form-group text-center'>
+<button type='button' class='btn btn-lg btn-primary' id='save' onclick='saveData()' disabled>Save </button>
+<button type='button' class='btn btn-lg btn-primary' id='change' onclick='changeData()' disabled>Change</button>
+<button type='button' class='btn btn-lg btn-primary' id='reset' onclick='resetForm()' disabled>Reset</button>
+</div>
+
+</div>
+
+<<script type='text/javascript' src='https://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js'></script>
+<script type='text/javascript' src='js/index.js'></script>
+<script>
+var connectionToken="90932559|-31949277400030541|90949307";
+var dbName="SCHOOL-DB";
+var dbRelation="STUDENT-TABLE";
+var jpdbBaseURL="http://api.login2explore.com:5577";
+var jpdbIRL="/api/irl";
+var jpdbIML="/api/iml";
+
+
+
+
+function getStudent()
+{
+var rollNumberJSON=getStudentRollNumberAsJSON();
+var getRequest=createGET_BY_KEYRequest(connectionToken,dbName,dbRelation,rollNumberJSON);
+jQuery.ajaxSetup({async:false});
+var resultObj=executeCommandAtGivenBaseUrl(getRequest,jpdbBaseURL,jpdbIRL);
+jQuery.ajaxSetup({async:true});
+if(resultObj.status==400)
+{
+$("#save").prop("disabled",false);
+}
+else
+{
+if(resultObj.status==200)
+{
+$("#rollNumber").prop("disabled",true);
+fillData(resultObj);
+$("#change").prop("disabled",false);
+$("#reset").prop("disabled",false);
+}
+}
+$("#reset").prop("disabled",false);
+$("#name").prop("disabled",false);
+$("#className").prop("disabled",false);
+$("#dateOfBirth").prop("disabled",false);
+$("#address").prop("disabled",false);
+$("#enrollmentDate").prop("disabled",false);
+$("#name").focus();
+
+}
+function saveRecord(jsonObj)
+{
+var localData=JSON.parse(jsonObj.data);
+localStorage.setItem("recno",localData.rec_no);
+}
+function getStudentRollNumberAsJSON()
+{
+var rollNumber=$("#rollNumber").val();
+var jsonStr={
+"rollNumber" : rollNumber
+};
+return JSON.stringify(jsonStr);
+}
+function fillData(jsonObj)
+{
+saveRecord(jsonObj);
+var data=JSON.parse(jsonObj.data).record;
+$("#name").val(data.name);
+$("#className").val(data.className);
+$("#dateOfBirth").val(data.dateOfBirth);
+$("#address").val(data.address);
+$("#enrollmentDate").val(data.enrollmentDate);
+}
+function changeData()
+{
+$("#change").prop('disabled',true);
+var jsonStr=validateData();
+var updateRequest=createUPDATERecordRequest(connectionToken,jsonStr,dbName,dbRelation,localStorage.getItem("recno"));
+jQuery.ajaxSetup({async:false});
+var resultObj=executeCommandAtGivenBaseUrl(updateRequest,jpdbBaseURL,jpdbIML);
+alert(JSON.stringify(resultObj));
+jQuery.ajaxSetup({async:true});
+resetForm();
+$("#rollNumber").focus();
+}
+function validateData()
+{
+var rollNumber=$("#rollNumber").val();
+var name=$("#name").val();
+var className=$("#className").val();
+var dateOfBirth=$("#dateOfBirth").val();
+var address=$("#address").val();
+var enrollmentDate=$("#enrollmentDate").val();
+if(rollNumber==="")
+{
+alert("Roll number is missing");
+$("#rollNumber").focus();
+return "";
+}
+
+if(name==="")
+{
+alert("name is missing");
+$("#name").focus();
+return "";
+}
+
+if(className==="")
+{
+alert("class name is missing");
+$("#className").focus();
+return "";
+}
+
+if(dateOfBirth==="")
+{
+alert("Date of birth is missing");
+$("#dateOfBirth").focus();
+return "";
+}
+
+if(address==="")
+{
+alert("Address is missing");
+$("#address").focus();
+return "";
+}
+
+if(enrollmentDate==="")
+{
+alert("Enrollment Date is missing");
+$("#enrollmentDate").focus();
+return "";
+}
+var jsonStr={
+"rollNumber": rollNumber,
+"name": name,
+"className": className,
+"dateOfBirth" : dateOfBirth,
+"address": address,
+"enrollmentDate": enrollmentDate
+};
+return JSON.stringify(jsonStr);
+}
+function resetForm()
+{
+$("#rollNumber").val("");
+$("#name").val("");
+$("#name").prop("disabled",true);
+$("#className").val("");
+$("#className").prop("disabled",true);
+$("#dateOfBirth").val("");
+$("#dateOfBirth").prop("disabled",true);
+$("#address").val("");
+$("#address").prop("disabled",true);
+$("#enrollmentDate").val("");
+$("#enrollmentDate").prop("disabled",true);
+$("#rollNumber").prop("disabled",false);
+$("#save").prop("disabled",true);
+$("#change").prop("disabled",true);
+$("#reset").prop("disabled",true);
+$("#rollNumber").focus();
+
+}
+
+function saveData()
+{
+var jsonStr=validateData();
+if(jsonStr==="")
+{
+return;
+}
+var putReqStr=createPUTRequest(connectionToken,jsonStr,dbName,dbRelation);
+alert(putReqStr);
+jQuery.ajaxSetup({async:false});
+var resultObj=executeCommandAtGivenBaseUrl(putReqStr,jpdbBaseURL,jpdbIML);
+alert(JSON.stringify(resultObj));
+jQuery.ajaxSetup({async:true});
+resetForm();
+}
+
+
+</script>
+</body>
+</html>
